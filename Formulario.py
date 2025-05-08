@@ -48,55 +48,17 @@ st.markdown("""
 > Los campos marcados con **(*)** son obligatorios.
 """)
 
-import streamlit as st
-import pandas as pd
-import os
-import requests
-from io import BytesIO
-
-# URL RAW del archivo en GitHub (ajústala si cambias el nombre o ubicación del archivo)
-RAW_URL = "https://raw.githubusercontent.com/Wilsonsr/MINSALUD/main/DIVIPOLA_Municipios.xlsx"
-
-# Ruta local del archivo
-file_path = "DIVIPOLA_Municipios.xlsx"
-
 # -------- Cargar municipios y departamentos --------
 try:
-    # Verificar si el archivo local existe
-    if os.path.exists(file_path):
-        st.info(f"Cargando archivo local: {file_path}")
-        municipios_df = pd.read_excel(file_path)
-    else:
-        st.warning("El archivo local no se encontró. Intentando cargar desde GitHub...")
-        response = requests.get(RAW_URL)
-        response.raise_for_status()
-        municipios_df = pd.read_excel(BytesIO(response.content))
-
-    # Verificar columnas esperadas
-    expected_columns = ["Nombre Departamento", "Nombre Municipio"]
-    missing_columns = [col for col in expected_columns if col not in municipios_df.columns]
-    
-    if missing_columns:
-        st.error(f"El archivo no tiene las columnas esperadas: {missing_columns}")
+    municipios_df = pd.read_excel("DIVIPOLA_Municipios.xlsx")
+    if "Nombre Departamento" not in municipios_df.columns or "Nombre Municipio" not in municipios_df.columns:
+        st.error("El archivo no tiene las columnas esperadas ('Nombre Departamento' y 'Nombre Municipio').")
         st.stop()
     
-    # Obtener departamentos únicos
     departamentos = municipios_df["Nombre Departamento"].drop_duplicates().sort_values()
 
-    # Mostrar mensaje de éxito
-    st.success("Datos cargados correctamente.")
-    st.write(municipios_df.head())
-
 except FileNotFoundError:
-    st.error(f"No se encontró el archivo '{file_path}' y no se pudo acceder al enlace RAW.")
-    st.stop()
-
-except requests.HTTPError as e:
-    st.error(f"Error al descargar el archivo desde GitHub: {e}")
-    st.stop()
-
-except Exception as e:
-    st.error(f"Ocurrió un error al cargar los datos: {e}")
+    st.error("Error: No se encontró el archivo 'DIVIPOLA_Municipios.xlsx'. Verifica que esté en la misma carpeta que este script.")
     st.stop()
 
 # -------- Selección de Departamento y Municipio --------
