@@ -50,7 +50,7 @@ st.markdown("""
 
 # -------- Cargar municipios y departamentos --------
 try:
-    municipios_df = pd.read_excel("DIVIPOLA_Municipios.xlsx", engine='openpyxl')
+    municipios_df = pd.read_excel("DIVIPOLA_Municipios.xlsx")
     if "Nombre Departamento" not in municipios_df.columns or "Nombre Municipio" not in municipios_df.columns:
         st.error("El archivo no tiene las columnas esperadas ('Nombre Departamento' y 'Nombre Municipio').")
         st.stop()
